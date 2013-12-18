@@ -5,24 +5,38 @@ module VagrantPlugins
         def initialize(app, env)
           @app = app
           @env = env
-
-          provisioner = @env[:global_config].vm.provisioners[0]
-          @puppet_config = provisioner ? provisioner.config: nil
-          @vagrant_git_commiter_details = '.VAGRANT_GIT_COMMITER_DETAILS'
+          @puppet_fact_generator = @env[:global_config].puppet_fact_generator
+          @puppet_module_registy = @env[:global_config].puppet_module_registry
         end
 
-        # generate custom facts and add them to our puppet_config if available
-        def generate_custom_facts()
-          if @puppet_config
-            facts = {}
-            generate_git_commiter_facts(facts)
-            facts.each_pair { |k, v| @env[:ui].success "Creating fact #{k} => #{v}" }
-            @puppet_config.facter = @puppet_config.facter.merge(facts)
+        # During puppet provision vagrant links all the paths provided to
+        # `puppet.module_path` to temporary shared paths within the vm. It does
+        # this by looping through `puppet.module_path` and linking to
+        # /tmp/vagrant-puppet/modules-N, N being the index of the path within
+        # the module_path array. Modules need to reference this temporary
+        # directory in order to install certain files. Instead of guessing at
+        # which temporary directory it will be installed in, we generate custom
+        # facts that can be referenced within the module's manifests.
+        #
+        #   These custom facts will be of the form: "#{name}_vagrant_module_path"
+        def generate_module_facts(facts)
+          module_paths = @puppet_module_registry.get_puppet_module_paths()
+          module_map = @puppet_module_registry.get_puppet_module_path_map()
+          module_paths.each_with_index do |path, i|
+            name = module_map.fetch(path)
+            if not name
+              env[:ui].warn "Failed to install custom fact for #{path}. No reference in @puppet_module_registry.puppet_module_path_to_name."
+            else
+              @puppet_fact_generator.add_fact(
+                "#{name}_vagrant_module_path",
+                File.join(@puppet_config.temp_dir, "modules-#{i}")
+              )
+            end
           end
         end
 
         def call(env)
-          generate_custom_facts()
+          generate_module_facts()
           @app.call(env)
         end
 
