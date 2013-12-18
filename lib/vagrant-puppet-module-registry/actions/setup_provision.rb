@@ -31,8 +31,6 @@ module VagrantPlugins
               if not name
                 env[:ui].warn "Failed to install custom fact for #{path}. No reference in @puppet_module_registry.puppet_module_path_to_name."
               else
-                require 'debugger'
-                debugger
                 @puppet_fact_generator.add_fact(
                   "#{name}_vagrant_module_path",
                   File.join(@puppet_config.temp_dir, "modules-#{i}")
