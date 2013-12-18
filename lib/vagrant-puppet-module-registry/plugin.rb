@@ -20,17 +20,9 @@ DESC
       end
 
       # define hooks
-      action_hook 'setup_provision', 'machine_action_up' do |hook|
+      action_hook 'setup_provision' do |hook|
         require_relative 'actions/setup_provision'
-        hook.prepend(Action::SetupProvision)
-      end
-      action_hook 'setup_provision', 'machine_action_provision' do |hook|
-        require_relative 'actions/setup_provision'
-        hook.prepend(Action::SetupProvision)
-      end
-      action_hook 'setup_provision', 'machine_action_reload' do |hook|
-        require_relative 'actions/setup_provision'
-        hook.prepend(Action::SetupProvision)
+        hook.before VagrantPlugins::ProviderVirtualBox::Action::CheckAccessible, Action::SetupProvision
       end
 
     end
