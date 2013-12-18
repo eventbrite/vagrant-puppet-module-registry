@@ -1,7 +1,7 @@
 module VagrantPlugins
   module PuppetModuleRegistry
     class Action
-      class SetupProvision
+      class AddModuleFacts
         def initialize(app, env)
           @app = app
           @env = env
@@ -22,7 +22,7 @@ module VagrantPlugins
         # facts that can be referenced within the module's manifests.
         #
         #   These custom facts will be of the form: "#{name}_vagrant_module_path"
-        def generate_module_facts()
+        def call(env)
           if @puppet_config
             module_paths = @puppet_module_registry.get_puppet_module_paths()
             module_map = @puppet_module_registry.get_puppet_module_path_map()
@@ -38,10 +38,6 @@ module VagrantPlugins
               end
             end
           end
-        end
-
-        def call(env)
-          generate_module_facts()
           @app.call(env)
         end
 

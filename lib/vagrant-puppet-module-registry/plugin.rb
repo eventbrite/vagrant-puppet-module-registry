@@ -20,9 +20,9 @@ DESC
       end
 
       # define hooks
-      action_hook 'setup_provision' do |hook|
-        require_relative 'actions/setup_provision'
-        hook.before VagrantPlugins::PuppetFactGenerator::Action::GenerateFacts, Action::SetupProvision
+      action_hook 'add_module_facts' do |hook|
+        require_relative 'actions/add_module_facts'
+        hook.before VagrantPlugins::PuppetFactGenerator::Action::GenerateFacts, Action::AddModuleFacts
       end
 
     end
