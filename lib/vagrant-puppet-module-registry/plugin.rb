@@ -22,7 +22,7 @@ DESC
       # define hooks
       action_hook 'setup_provision' do |hook|
         require_relative 'actions/setup_provision'
-        hook.before VagrantPlugins::ProviderVirtualBox::Action::CheckAccessible, Action::SetupProvision
+        hook.before VagrantPlugins::PuppetFactGenerator::Action::GenerateFacts, Action::SetupProvision
       end
 
     end
