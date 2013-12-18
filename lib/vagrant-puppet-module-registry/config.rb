@@ -39,8 +39,8 @@ module VagrantPlugins
       end
 
       def finalize!
-        @puppet_module_paths = nil if @puppet_module_paths == UNSET_VALUE
-        @puppet_module_path_to_name = nil if @puppet_module_path_to_name == UNSET_VALUE
+        @puppet_module_paths = [] if @puppet_module_paths == UNSET_VALUE
+        @puppet_module_path_to_name = {} if @puppet_module_path_to_name == UNSET_VALUE
       end
 
       def validate(machine)
