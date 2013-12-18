@@ -6,7 +6,10 @@ module VagrantPlugins
           @app = app
           @env = env
           @puppet_fact_generator = @env[:global_config].puppet_fact_generator
-          @puppet_module_registy = @env[:global_config].puppet_module_registry
+          @puppet_module_registry = @env[:global_config].puppet_module_registry
+
+          provisioner = @env[:global_config].vm.provisioners[0]
+          @puppet_config = provisioner ? provisioner.config: nil
         end
 
         # During puppet provision vagrant links all the paths provided to
@@ -19,18 +22,22 @@ module VagrantPlugins
         # facts that can be referenced within the module's manifests.
         #
         #   These custom facts will be of the form: "#{name}_vagrant_module_path"
-        def generate_module_facts(facts)
-          module_paths = @puppet_module_registry.get_puppet_module_paths()
-          module_map = @puppet_module_registry.get_puppet_module_path_map()
-          module_paths.each_with_index do |path, i|
-            name = module_map.fetch(path)
-            if not name
-              env[:ui].warn "Failed to install custom fact for #{path}. No reference in @puppet_module_registry.puppet_module_path_to_name."
-            else
-              @puppet_fact_generator.add_fact(
-                "#{name}_vagrant_module_path",
-                File.join(@puppet_config.temp_dir, "modules-#{i}")
-              )
+        def generate_module_facts()
+          if @puppet_config
+            module_paths = @puppet_module_registry.get_puppet_module_paths()
+            module_map = @puppet_module_registry.get_puppet_module_path_map()
+            module_paths.each_with_index do |path, i|
+              name = module_map.fetch(path)
+              if not name
+                env[:ui].warn "Failed to install custom fact for #{path}. No reference in @puppet_module_registry.puppet_module_path_to_name."
+              else
+                require 'debugger'
+                debugger
+                @puppet_fact_generator.add_fact(
+                  "#{name}_vagrant_module_path",
+                  File.join(@puppet_config.temp_dir, "modules-#{i}")
+                )
+              end
             end
           end
         end
