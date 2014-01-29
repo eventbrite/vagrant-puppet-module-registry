@@ -4,6 +4,11 @@ rescue LoadError
   abort 'vagrant-puppet-module-registry must be loaded in a Vagrant environment.'
 end
 
+begin
+  require 'vagrant-puppet-fact-generator'
+rescue LoadError
+  abort 'vagrant-puppet-module-registry depends on the `vagrant-puppet-fact-generator` plugin.'
+end
 
 module VagrantPlugins
   module PuppetModuleRegistry
