@@ -5,10 +5,10 @@ module VagrantPlugins
         def initialize(app, env)
           @app = app
           @env = env
-          @puppet_fact_generator = @env[:global_config].puppet_fact_generator
-          @puppet_module_registry = @env[:global_config].puppet_module_registry
+          @puppet_fact_generator = @env[:machine].config.puppet_fact_generator
+          @puppet_module_registry = @env[:machine].config.puppet_module_registry
 
-          provisioner = @env[:global_config].vm.provisioners[0]
+          provisioner = @env[:machine].config.vm.provisioners[0]
           @puppet_config = provisioner ? provisioner.config: nil
         end
 
